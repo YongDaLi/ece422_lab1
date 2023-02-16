@@ -9,10 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # change the theory calculations as needed
-theta_theory = np.arange(0, 2*np.pi, 0.1)
+theta_theory = np.arange(0, 2*np.pi, 0.01)
 # r_theory = np.sin(theta_theory)
 # r_theory = ( (np.cos(np.pi/2 * np.cos(theta_theory))) / (np.sin(theta_theory)) )**2
-r_theory = 0.5* np.ones(len(theta_theory))     # constant
+r_theory = 1.0* np.ones(len(theta_theory))     # constant
 
 filename = "dipole_hplane.txt"
 theta = []
