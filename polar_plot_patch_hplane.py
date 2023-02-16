@@ -66,7 +66,7 @@ ax.set_theta_direction(-1)  # theta increasing clockwise
 ax.set_rticks([0.5, 1.0])  # Less radial ticks
 # ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
 ax.grid(True)
-ax.legend(loc="upper left")
+ax.legend(loc="lower center")
 ax.set_title(filename, va='bottom')
 plt.savefig("plots/" + filename.replace("txt", "png"))
 # plt.show()
