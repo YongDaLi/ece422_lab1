@@ -8,13 +8,29 @@ polar plots for ECE422 lab 1
 import numpy as np
 import matplotlib.pyplot as plt
 
-# change the theory calculations as needed
-theta_theory = np.arange(0, 2*np.pi, 0.1)
-r_theory = np.sin(theta_theory)
-# r_theory = ( (np.cos(np.pi/2 * np.cos(theta_theory))) / (np.sin(theta_theory)) )**2
-# r_theory = 0.5* np.ones(len(theta_theory))     # constant
+# setup calculation input variables
+n_index = 1         # refractive index of air
+freq = 893e6        # we did patch antenna at 893MHz (center frequency)
+wavelength = (3e8/n_index) / freq       # effective wavelength
+k0 = 2*np.pi / wavelength               # free space wave vector at frequency of interest
+L_e = 89.568e-3                         # effective length of the patch, 89.568mm
+h = 0.8e-3                              # thickness of substrate
+w = 87.63e-3                            # width of the patch
 
-filename = "cross_pol_dipole_vertical.txt"
+# change the theory calculations as needed
+theta_theory = np.arange(0, np.pi, 0.1)
+
+
+# split up calculation
+kh = k0 * h / 2
+kw = k0 * w / 2
+kl = k0 * L_e / 2
+
+r_theory = np.sin(theta_theory) \
+    * np.sin(kh*np.sin(theta_theory))/(kh*np.sin(theta_theory)) \
+    * np.sin(kw*np.cos(theta_theory))/(kw*np.cos(theta_theory))
+
+filename = "patch_hplane.txt"
 theta = []
 val = []
 with open(filename, "r") as f:
@@ -34,39 +50,14 @@ val_raised = val - min(val)
 
 val_norm = val_raised / max(val_raised)
 
-
-# =============================================
-
-filename = "dipole_hplane.txt"
-theta1 = []
-val1 = []
-with open(filename, "r") as f:
-    line = f.read().split("\n")
-    for elem in line:
-        theta1.append(float(elem.split("\t")[0]))
-        val1.append(float(elem.split("\t")[1]))
-
-
-# convert theta1 to radians
-theta1 = np.array(theta1)
-# our measurement started at max power (this should be theta1 = 90)
-theta1 = ((theta1+90) % 360) * np.pi / 180
-
-# raise so min val1ue is 0, and normalize
-val1 = np.array(val1)
-val1_raised = val1 - min(val1)
-
-val1_norm = val1_raised / max(val1_raised)
-
 # ====== debugging ==========
 # print("==== this is what is being plotted after normalizing and re-orienting ====")
 # for i, (x, y) in enumerate(zip(theta, val_norm)):
 #     print("{:2d}, {:f}, {:f}".format( i, x, y))
 
 fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-ax.scatter(theta, val_norm, label="cross-polarized")
-ax.scatter(theta1, val1_norm, label="co-polarized")
-# ax.scatter(theta_theory, r_theory, label="theory")
+ax.scatter(theta, val_norm, label="experiment")
+ax.plot(theta_theory, r_theory, color='orange', label="theory")
 ax.set_theta_zero_location("N")
 ax.set_theta_direction(-1)  # theta increasing clockwise
 
@@ -75,7 +66,7 @@ ax.set_theta_direction(-1)  # theta increasing clockwise
 ax.set_rticks([0.5, 1.0])  # Less radial ticks
 # ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
 ax.grid(True)
-ax.legend()
-ax.set_title("cross_pol_on_eplane", va='bottom')
-# plt.savefig("plots/" + "cross_pol_on_eplane.png")
+ax.legend(loc="upper left")
+ax.set_title(filename, va='bottom')
+plt.savefig("plots/" + filename.replace("txt", "png"))
 # plt.show()
